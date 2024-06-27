@@ -1,27 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 
 const DetailArea = () => {
-  const DemoPaper = styled(Paper)(({ theme }) => ({
-    width: 120,
-    height: 120,
-    padding: theme.spacing(2),
-    ...theme.typography.h6,
-    textAlign: "center",
-    backgroundColor:"grey"
-  }));
+  const [stateG, setStateG] = useState([]); // Correct usage of useState
+
+  useEffect(() => {
+  
+    const getCount_graph = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/counter");
+        console.log(response.data);
+        setStateG(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    const interval = setInterval(() => {
+    getCount_graph()},5000)
+
+    return () => clearInterval(interval);
+  }, []
+)
+  
   return (
     <>
       
-      <div style={{ display: "inline-flex", gap: "2rem", margin: "2rem"}}>
-     
-        <Stack direction="row" spacing={2}>
-        Going_in:<DemoPaper square={false} > 16</DemoPaper>
-        <DemoPaper square>Going_out: 10</DemoPaper>
-      </Stack>
-      </div>
+      {stateG && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh'  }}>
+            <MultiAxisLineChart data={stateG} />
+          </div>
+        )}
     </>
   );
 };
